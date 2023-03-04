@@ -26,7 +26,7 @@
                 <h4 class="header-subtitle" >Hello, I am  <span class="typed"></span></h4>
                 <h1 class="header-title">Taha Arar</h1>
                 <h6 class="header-mono" >Back-End Web Developer | Java Developer | UML Modeling </h6>
-                <a class="btn btn-primary btn-rounded" style="cursor: pointer" th:href="@{/DownloadFile}" target="_blank"><i class="ti-printer pr-2" ></i>Print Resume</a>
+                <button class="btn btn-primary btn-rounded" style="cursor: pointer" onclick="printCV()"><i class="ti-printer pr-2" ></i>Print Resume</button>
             </div>
         </div>
     </header>
@@ -77,7 +77,7 @@
                 <p class="mt-20">Taha Arar, Algerian web Developer with robust problem-solving skills. I love programming and
                     developing myself. Not only that, but I am a fast learner who loves challenges and new
                     experiences. </p>
-                <a class="btn btn-outline-danger" href="shorturl.atHLS68" target="_blank"><i class="icon-down-circled2 "></i>Download My CV</a>
+                <a class="btn btn-outline-danger" th:href="@{/downloadCV}"><i class="icon-down-circled2 "></i>Download My CV</a>
             </div>
             <div class="col-lg-4 about-card">
                 <h3 class="font-weight-light">Personal Info</h3>
@@ -725,6 +725,8 @@
 
     <!-- JohnDoe js -->
     <script src="../static/js/johndoe.js" th:src="@{/js/johndoe.js}"></script>
+
+
 
 </body>
 </html>
