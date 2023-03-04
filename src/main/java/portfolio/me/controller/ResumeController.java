@@ -3,7 +3,11 @@ package portfolio.me.controller;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import portfolio.me.model.EmailRequest;
+import portfolio.me.service.EmailService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +19,11 @@ import java.net.URL;
 
 public class ResumeController {
 
+     private final EmailService emailService;
 
+    public ResumeController(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @RequestMapping("/")
     public String index() throws IOException {
@@ -49,6 +57,16 @@ public class ResumeController {
         headers.setContentLength(outputStream.toByteArray().length);
 
         return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/sendEmail")
+    public ResponseEntity<?> sendEmail(EmailRequest emailRequest) {
+        String from = emailRequest.getFrom();
+        String subject = emailRequest.getSubject();
+        String text = emailRequest.getText();
+        System.out.println("***********"+from+subject+text);
+        this.emailService.sendEmail(from, subject, text);
+        return ResponseEntity.ok().build();
     }
 
 
