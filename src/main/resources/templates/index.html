@@ -28,6 +28,7 @@
                 <h6 class="header-mono" >Back-End Web Developer | Java Developer | UML Modeling </h6>
                 <button class="btn btn-primary btn-rounded" style="cursor: pointer" onclick="printCV()"><i class="ti-printer pr-2" ></i>Print Resume</button>
             </div>
+
         </div>
     </header>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-white" data-spy="affix" data-offset-top="510">
@@ -725,7 +726,20 @@
 
     <!-- JohnDoe js -->
     <script src="../static/js/johndoe.js" th:src="@{/js/johndoe.js}"></script>
+  <script>
+      function printCV() {
+          // Replace the URL with the URL of your PDF file
+          var pdfURL = 'https://uc7dd7c1293bb390994ddb60ecc3.previews.dropboxusercontent.com/p/orig/AB0WFAZe2vMtn8ko5_4t8WEuceneRRqXs5xqGRVvnO3veuesXgh1knbFkHQiOSbYepf79tLxm-y84xqTWtu-fvXe76EZqX-IcACH0dBvfn27L-Hvwh3C967FPPllpLTLNFA7fBei6sAnxFPYDUTmpTsznrfkWpSvyT4LzuNLd5np1pe2Lq4oWy9Lii32nZXYW6F2kj8tddh6ncB4YcBe24K5GnrE7OIVschjLFfmu5dD9AzknwIZPnizmPiuVhxrZUzfOJ8Yk-z6Kl0QreUWZsXwfk772eoFr65Ng4wF4pb_3Y68nJkvgKFqv2R8c2kH_qtd9qF7B3smMn7yxvEXcLgoKKdo6rdWKI3fZLtljAvg4lJiYL3wyzpiXs770d7CPtyrO5l79yW0Jsn83oEOyps06ZHkuKv5uoAjNKAq8UKJaQ/p.pdf';
+          // Open the PDF file in a new window
+          var pdfWindow = window.open(pdfURL);
+          // Wait for the PDF file to finish loading
+          pdfWindow.onload = function() {
+              // Trigger the print dialog
+              pdfWindow.print();
+          };
+      }
 
+  </script>
 
 
 </body>
