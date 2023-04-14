@@ -1,23 +1,24 @@
 package portfolio.me.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     public void sendEmail(String from, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("taha.arar@univ-constantine2.dz");
-        message.setFrom(from);
+        message.setTo(from);
+        message.setFrom("tahaarar31@gmail.com");
         message.setSubject(subject);
         message.setText(text);
-        System.out.println("till now all is good hhhh ");
         mailSender.send(message);
+        System.out.println("E-mail was send successfully ! ************************");
+
     }
 }

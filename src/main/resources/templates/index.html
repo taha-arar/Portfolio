@@ -1,6 +1,65 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+
+
+    <style>
+        #print-button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #print-dialog {
+            position: fixed;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+        }
+
+        #print-overlay {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #print-overlay button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 0;
+            line-height: 1;
+            color: #fff;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        #print-overlay button:hover {
+            color: #ccc;
+        }
+
+        #print-overlay iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+
+    </style>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Start your development with JohnDoe landing page.">
@@ -11,6 +70,9 @@
     <!-- Bootstrap + JohnDoe main styles -->
 	<link rel="stylesheet" href="../static/css/johndoe.css" th:href="@{/css/johndoe.css}">
     <link rel="shortcut icon" href="../static/imgs/avatarTaha.jpg" th:href="@{/imgs/avatarTaha.jpg}"></link>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
     <header class="header">
@@ -26,9 +88,14 @@
                 <h4 class="header-subtitle" >Hello, I am  <span class="typed"></span></h4>
                 <h1 class="header-title">Taha Arar</h1>
                 <h6 class="header-mono" >Back-End Web Developer | Java Developer | UML Modeling </h6>
-                <button class="btn btn-primary btn-rounded" style="cursor: pointer" onclick="printCV()"><i class="ti-printer pr-2" ></i>Print Resume</button>
+                <button  class="btn btn-primary btn-rounded" id="print-btn" onclick="printPDF()" style="cursor: pointer" ><i class="ti-printer pr-2" ></i>Print Resume</button>
             </div>
-
+        </div>
+        <div id="print-dialog">
+            <div id="print-overlay">
+                <button id="close-button">&#x2716;</button>
+                <iframe id="pdf-frame"></iframe>
+            </div>
         </div>
     </header>
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-white" data-spy="affix" data-offset-top="510">
@@ -726,20 +793,49 @@
 
     <!-- JohnDoe js -->
     <script src="../static/js/johndoe.js" th:src="@{/js/johndoe.js}"></script>
-  <script>
-      function printCV() {
-          // Replace the URL with the URL of your PDF file
-          var pdfURL = 'https://uc7dd7c1293bb390994ddb60ecc3.previews.dropboxusercontent.com/p/orig/AB0WFAZe2vMtn8ko5_4t8WEuceneRRqXs5xqGRVvnO3veuesXgh1knbFkHQiOSbYepf79tLxm-y84xqTWtu-fvXe76EZqX-IcACH0dBvfn27L-Hvwh3C967FPPllpLTLNFA7fBei6sAnxFPYDUTmpTsznrfkWpSvyT4LzuNLd5np1pe2Lq4oWy9Lii32nZXYW6F2kj8tddh6ncB4YcBe24K5GnrE7OIVschjLFfmu5dD9AzknwIZPnizmPiuVhxrZUzfOJ8Yk-z6Kl0QreUWZsXwfk772eoFr65Ng4wF4pb_3Y68nJkvgKFqv2R8c2kH_qtd9qF7B3smMn7yxvEXcLgoKKdo6rdWKI3fZLtljAvg4lJiYL3wyzpiXs770d7CPtyrO5l79yW0Jsn83oEOyps06ZHkuKv5uoAjNKAq8UKJaQ/p.pdf';
-          // Open the PDF file in a new window
-          var pdfWindow = window.open(pdfURL);
-          // Wait for the PDF file to finish loading
-          pdfWindow.onload = function() {
-              // Trigger the print dialog
-              pdfWindow.print();
-          };
-      }
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
 
-  </script>
+    <!-- If you enabled Firebase products in your project, add the Firebase SDK for the products you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-storage.js"></script>
+
+
+    <script>
+
+        function printPDF() {
+            var printDialog = document.getElementById("print-dialog");
+            var pdfURL = "https://firebasestorage.googleapis.com/v0/b/taha-s-portfolio.appspot.com/o/Taha%20Arar%20CV%20October-2022.pdf?alt=media&token=021c12a6-229e-4257-bace-52d7de29d98e";
+            var iframe = printDialog.getElementsByTagName("iframe")[0];
+
+            iframe.src = pdfURL;
+
+            // Show the print dialog
+            printDialog.style.display = "block";
+
+            // Wait a short time for the PDF to render
+            setTimeout(function() {
+                // Print the iframe contents
+                iframe.contentWindow.print();
+                // Hide the print dialog after printing is complete
+                printDialog.style.display = "none";
+            }, 1000);
+
+        }
+
+        var closeButton = document.getElementById('close-button');
+        closeButton.addEventListener('click', function() {
+            document.getElementById('print-dialog').style.display = 'none';
+        });
+
+        document.addEventListener("click", (event) => {
+            // Check if the event target is not inside the print dialog
+            if (!printDialog.contains(event.target) && event.target !== printDialog) {
+                printDialog.style.display = "none";
+                pdfFrame.src = "";
+            }
+        });
+    </script>
 
 
 </body>

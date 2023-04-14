@@ -1,6 +1,9 @@
 package portfolio.me.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,8 +24,18 @@ public class ResumeController {
 
      private final EmailService emailService;
 
-    public ResumeController(EmailService emailService) {
+     private final JavaMailSender mailSender;
+
+
+    @Value("${email.subject}")
+    private String emailSubject;
+
+    @Value("${email.to}")
+    private String emailTo;
+
+    public ResumeController(EmailService emailService, JavaMailSender mailSender) {
         this.emailService = emailService;
+        this.mailSender = mailSender;
     }
 
     @RequestMapping("/")
@@ -59,14 +72,31 @@ public class ResumeController {
         return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
     }
 
+
+
     @PostMapping("/sendEmail")
-    public ResponseEntity<?> sendEmail(EmailRequest emailRequest) {
-        String from = emailRequest.getFrom();
-        String subject = emailRequest.getSubject();
-        String text = emailRequest.getText();
-        System.out.println("***********"+from+subject+text);
-        this.emailService.sendEmail(from, subject, text);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> submitContactUsForm(@RequestBody EmailRequest request) {
+        try {
+            String emailText = "Name: " + request.getSubject() + "\n" +
+                    "Email: " + request.getFrom() + "\n" +
+                    "Message: " + request.getText();
+
+            System.out.println("*************"+emailText);
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(request.getFrom());
+            message.setTo(emailTo);
+            message.setSubject(emailSubject);
+            System.out.println("All good ******************");
+            message.setText(emailText);
+
+            mailSender.send(message);
+            System.out.println("email send...");
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 
