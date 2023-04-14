@@ -88,7 +88,7 @@
                 <h4 class="header-subtitle" >Hello, I am  <span class="typed"></span></h4>
                 <h1 class="header-title">Taha Arar</h1>
                 <h6 class="header-mono" >Back-End Web Developer | Java Developer | UML Modeling </h6>
-                <button  class="btn btn-primary btn-rounded" id="print-btn" onclick="printPDF()" style="cursor: pointer" ><i class="ti-printer pr-2" ></i>Print Resume</button>
+                <button  class="btn btn-primary btn-rounded" id="print-btn" onclick="printPdf()" style="cursor: pointer" ><i class="ti-printer pr-2" ></i>Print Resume</button>
             </div>
         </div>
         <div id="print-dialog">
@@ -800,43 +800,22 @@
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-storage.js"></script>
 
-
     <script>
-
-        function printPDF() {
-            var printDialog = document.getElementById("print-dialog");
-            var pdfURL = "https://firebasestorage.googleapis.com/v0/b/taha-s-portfolio.appspot.com/o/Taha%20Arar%20CV%20October-2022.pdf?alt=media&token=021c12a6-229e-4257-bace-52d7de29d98e";
-            var iframe = printDialog.getElementsByTagName("iframe")[0];
-
-            iframe.src = pdfURL;
-
-            // Show the print dialog
-            printDialog.style.display = "block";
-
-            // Wait a short time for the PDF to render
-            setTimeout(function() {
-                // Print the iframe contents
-                iframe.contentWindow.print();
-                // Hide the print dialog after printing is complete
-                printDialog.style.display = "none";
-            }, 1000);
-
+        function printPdf() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/print/pdf', true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onload = function() {
+                var pdfData = new Uint8Array(this.response);
+                var blob = new Blob([pdfData], {type: 'application/pdf'});
+                var url = URL.createObjectURL(blob);
+                var printWindow = window.open(url, 'Print PDF', 'width=800,height=600');
+                printWindow.print();
+                URL.revokeObjectURL(url);
+            };
+            xhr.send();
         }
-
-        var closeButton = document.getElementById('close-button');
-        closeButton.addEventListener('click', function() {
-            document.getElementById('print-dialog').style.display = 'none';
-        });
-
-        document.addEventListener("click", (event) => {
-            // Check if the event target is not inside the print dialog
-            if (!printDialog.contains(event.target) && event.target !== printDialog) {
-                printDialog.style.display = "none";
-                pdfFrame.src = "";
-            }
-        });
     </script>
-
 
 </body>
 </html>

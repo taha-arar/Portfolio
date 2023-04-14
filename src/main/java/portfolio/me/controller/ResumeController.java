@@ -1,5 +1,6 @@
 package portfolio.me.controller;
 
+import org.apache.pdfbox.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,9 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 import portfolio.me.model.EmailRequest;
 import portfolio.me.service.EmailService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -99,7 +102,24 @@ public class ResumeController {
         }
     }
 
+    @GetMapping("/print/pdf")
+    public ResponseEntity<byte[]> printPdf() throws IOException {
+        String pdfUrl = "https://firebasestorage.googleapis.com/v0/b/taha-s-portfolio.appspot.com/o/Taha%20Arar%20CV%20October-2022.pdf?alt=media&token=14c89fab-b13a-49c1-8468-a19b47553496";
+        URL url = new URL(pdfUrl);
+        InputStream in = url.openStream();
+        byte[] pdfBytes = IOUtils.toByteArray(in);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("inline").build());
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        ResponseEntity<byte[]> response = new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 
 
+        return response;
+    }
 
 }
+
+
+
+
