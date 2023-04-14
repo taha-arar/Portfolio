@@ -4,6 +4,21 @@
 
 
     <style>
+
+        @media print {
+            body {
+                visibility: hidden;
+            }
+            #print-window, #print-window * {
+                visibility: visible;
+            }
+            #print-window {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+
         #print-button {
             font-size: 18px;
             padding: 10px 20px;
@@ -809,13 +824,16 @@
                 var pdfData = new Uint8Array(this.response);
                 var blob = new Blob([pdfData], {type: 'application/pdf'});
                 var url = URL.createObjectURL(blob);
-                var printWindow = window.open(url, 'Print PDF', 'width=800,height=600');
-                printWindow.print();
+                var printWindow = window.open(url, 'Print PDF', 'width=1000,height=800');
+                printWindow.onload = function() {
+                    printWindow.print();
+                };
                 URL.revokeObjectURL(url);
             };
             xhr.send();
         }
     </script>
+    <div id="print-window" style="display:none;"></div>
 
 </body>
 </html>
